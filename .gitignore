@@ -1,0 +1,26 @@
+# Sensitive API keys & credentials
+config.py
+.env
+*.key
+
+# Personal memory file
+memory.txt
+
+# Python cache & bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Audio generation cache
+*.mp3
+*.wav
+
+# Temp folders
+folder/
+*.tmp
+
+# IDE files
+.vscode/
+.idea/
