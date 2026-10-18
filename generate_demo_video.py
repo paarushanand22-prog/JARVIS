@@ -303,12 +303,12 @@ def render_scene_6(frame_idx, total_frames):
     draw.text((WIDTH // 2 - 320, 480), "J. A. R. V. I. S.", font=FONT_BIG, fill=CYAN)
     draw.text((WIDTH // 2 - 380, 610), "Your Personal AI Executive Assistant", font=FONT_TITLE, fill=WHITE)
 
-    # GitHub URL Box
-    url_box = [(WIDTH // 2 - 460, 720), (WIDTH // 2 + 460, 810)]
-    draw.rounded_rectangle(url_box, radius=16, fill=(0, 60, 100), outline=CYAN, width=3)
-    draw.text((WIDTH // 2 - 420, 745), "GITHUB: github.com/paarushanand22-prog/JARVIS", font=FONT_BOLD, fill=WHITE)
+    # Commercial CTA Box
+    cta_box = [(WIDTH // 2 - 460, 720), (WIDTH // 2 + 460, 810)]
+    draw.rounded_rectangle(cta_box, radius=16, fill=(0, 60, 100), outline=CYAN, width=3)
+    draw.text((WIDTH // 2 - 390, 745), "GET JARVIS AI // AVAILABLE FOR WINDOWS 10 & 11", font=FONT_BOLD, fill=WHITE)
 
-    draw.text((WIDTH // 2 - 270, 870), "Open Source & Commercial Ready  •  2026", font=FONT_SUBTITLE, fill=GRAY)
+    draw.text((WIDTH // 2 - 300, 870), "Commercial Edition • $5/Month • Instant Access", font=FONT_SUBTITLE, fill=GRAY)
     return img
 
 def generate_video():
