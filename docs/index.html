@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JARVIS — Autonomous AI Desktop Executive Assistant for Windows</title>
+  <meta name="description" content="Control your PC with your voice, analyze your screen in real time, and create PowerPoint presentations on command. Powered by local GPU AI.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Cyber Background Canvas -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="logo">
+        <div class="logo-core"></div>
+        <span>J.A.R.V.I.S.</span>
+      </div>
+      <div class="nav-links">
+        <a href="#features">Capabilities</a>
+        <a href="#demo">Interactive Demo</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+      </div>
+      <div class="nav-action">
+        <a href="#pricing" class="btn btn-primary">Get JARVIS — $5/mo</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="hero-container">
+      <div class="pill-badge">
+        <span class="pulsing-dot"></span>
+        v2.4 Ready • Windows 10 & 11 • Local GPU Powered
+      </div>
+      <h1 class="hero-title">
+        Your Windows PC,<br>
+        <span class="gradient-text">Fully Autonomous.</span>
+      </h1>
+      <p class="hero-subtitle">
+        The ultimate personal AI assistant. Control your device with natural voice, analyze active screens in real-time, click options on command, and generate PowerPoint decks in seconds.
+      </p>
+
+      <div class="hero-cta">
+        <a href="#pricing" class="btn btn-primary btn-lg">
+          <span>Download Commercial Edition</span>
+          <span class="btn-subtext">$5 / month • Instant Activation</span>
+        </a>
+        <a href="#demo" class="btn btn-secondary btn-lg">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          Try Live Interactive Demo
+        </a>
+      </div>
+
+      <!-- Trust Badges -->
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-val">100%</span>
+          <span class="stat-label">Local & Private</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-val">&lt; 50ms</span>
+          <span class="stat-label">Screen Vision OCR</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-val">3 Languages</span>
+          <span class="stat-label">English, Hindi & Hinglish</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-val">Zero</span>
+          <span class="stat-label">Cloud Data Leaks</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Live Simulated Playground Section -->
+  <section id="demo" class="playground-section">
+    <div class="section-container">
+      <div class="section-header">
+        <h2 class="section-title">Experience JARVIS Live</h2>
+        <p class="section-subtitle">Test how JARVIS listens, analyzes your screen, and controls your PC in real-time.</p>
+      </div>
+
+      <div class="terminal-window">
+        <div class="terminal-bar">
+          <div class="terminal-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <div class="terminal-title">JARVIS AI Terminal // Active Mode</div>
+          <div class="terminal-status">● System Operational</div>
+        </div>
+
+        <div class="terminal-body" id="terminal-body">
+          <div class="log-row sys">
+            <span class="time">[SYSTEM]</span>
+            <span>J.A.R.V.I.S. Core Online. Neural Indian Voice Active. Whisper GPU Loaded.</span>
+          </div>
+          <div class="log-row bot">
+            <span class="prefix">🤖 JARVIS:</span>
+            <span>"System online sir. Main aapki kya madad kar sakta hoon?"</span>
+          </div>
+        </div>
+
+        <div class="terminal-presets">
+          <span class="presets-label">Quick Commands:</span>
+          <button class="preset-pill" onclick="simulateCommand('create_ppt')">📊 Create Big Bang PPT</button>
+          <button class="preset-pill" onclick="simulateCommand('click_settings')">🖱️ Click on Settings</button>
+          <button class="preset-pill" onclick="simulateCommand('analyze_screen')">👁️ Analyze My Screen</button>
+          <button class="preset-pill" onclick="simulateCommand('find_files')">🔍 Search for Resume</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Grid -->
+  <section id="features" class="features-section">
+    <div class="section-container">
+      <div class="section-header">
+        <h2 class="section-title">Built for Ultimate Productivity</h2>
+        <p class="section-subtitle">Everything you need to turn your laptop into an autonomous AI executive workstation.</p>
+      </div>
+
+      <div class="features-grid">
+        <!-- Feature 1 -->
+        <div class="feature-card">
+          <div class="feature-icon">👁️</div>
+          <h3>Real-Time Screen Analysis</h3>
+          <p>Inspects your active screen in milliseconds using Windows OCR and LLaVA Vision AI. Reads open windows, code, errors, and graphs.</p>
+          <div class="feature-tag">Vision AI + Windows OCR</div>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="feature-card">
+          <div class="feature-icon">🖱️</div>
+          <h3>Voice-Ordered Device Control</h3>
+          <p>Order JARVIS to click any button, link, menu, or tab on your screen. It locates the target and smoothly moves your mouse to click it.</p>
+          <div class="feature-tag">UI Automation + Coordinates</div>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>PowerPoint Slide Generator</h3>
+          <p>Say "Jarvis, make a presentation on AI" and watch it automatically author formatted multi-slide PowerPoint decks and launch them.</p>
+          <div class="feature-tag">Instant .pptx Builder</div>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="feature-card">
+          <div class="feature-icon">🔍</div>
+          <h3>Full Computer File Search</h3>
+          <p>Find any file, document, PDF, or video across your C:, D:, and E: drives in under a second and open it on voice command.</p>
+          <div class="feature-tag">Multi-Drive Indexer</div>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="feature-card">
+          <div class="feature-icon">🗣️</div>
+          <h3>Authentic Bilingual Voice</h3>
+          <p>Bilingual AI that speaks English via ElevenLabs and natural Hindi & Hinglish via Microsoft Neural Voice without robotic accents.</p>
+          <div class="feature-tag">Neural Indian TTS</div>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="feature-card">
+          <div class="feature-icon">🧠</div>
+          <h3>Autonomous Memory</h3>
+          <p>Remembers your habits, personal preferences, and job role autonomously across sessions so you never have to repeat yourself.</p>
+          <div class="feature-tag">Persistent Long-Term Memory</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section id="pricing" class="pricing-section">
+    <div class="section-container">
+      <div class="section-header">
+        <h2 class="section-title">Simple, Transparent Pricing</h2>
+        <p class="section-subtitle">No hidden charges. One low monthly price for your personal desktop executive.</p>
+      </div>
+
+      <div class="pricing-card-wrapper">
+        <div class="pricing-card featured">
+          <div class="pricing-badge">MOST POPULAR</div>
+          <h3 class="plan-name">Commercial Pro</h3>
+          <p class="plan-desc">Complete standalone JARVIS binary for Windows 10 & 11.</p>
+          
+          <div class="plan-price">
+            <span class="currency">$</span>
+            <span class="amount">5</span>
+            <span class="period">/ month</span>
+          </div>
+
+          <ul class="plan-features">
+            <li><span>✓</span> Unlimited Hands-Free Voice Commands</li>
+            <li><span>✓</span> Real-Time Screen Vision & Analysis</li>
+            <li><span>✓</span> Voice-Activated Device Clicking</li>
+            <li><span>✓</span> Automated PowerPoint Presentation Creator</li>
+            <li><span>✓</span> Multi-Drive File Search & Launcher</li>
+            <li><span>✓</span> English, Hindi & Hinglish Dual Voice Engine</li>
+            <li><span>✓</span> Hardware-Locked Anti-Piracy Key</li>
+            <li><span>✓</span> Free Automatic Software Updates</li>
+          </ul>
+
+          <a href="https://yourstore.lemonsqueezy.com" class="btn btn-primary btn-block">
+            Subscribe Now — $5/mo
+          </a>
+          <p class="money-back">7-Day Money-Back Guarantee • Cancel Anytime</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section id="faq" class="faq-section">
+    <div class="section-container">
+      <div class="section-header">
+        <h2 class="section-title">Frequently Asked Questions</h2>
+      </div>
+
+      <div class="faq-grid">
+        <div class="faq-item">
+          <h4>What are the system requirements?</h4>
+          <p>JARVIS is built for Windows 10 and 11. It runs best with 8GB–16GB RAM and any dedicated GPU (NVIDIA RTX/GTX), but also supports CPU mode.</p>
+        </div>
+        <div class="faq-item">
+          <h4>Is my screen and voice data private?</h4>
+          <p>Yes, 100%. All screen scanning, OCR, voice processing, and memory files run strictly on your local PC. Nothing is logged or sold.</p>
+        </div>
+        <div class="faq-item">
+          <h4>How does the $5/month license work?</h4>
+          <p>When you subscribe via Lemon Squeezy, you instantly receive a personal license key. Enter it upon first launch to bind JARVIS to your PC.</p>
+        </div>
+        <div class="faq-item">
+          <h4>Can JARVIS control any application?</h4>
+          <p>Yes. JARVIS can launch apps, click buttons, enter text, press shortcuts (Enter, Esc, Tab, Alt+F4), and search through files seamlessly.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div class="logo">
+          <div class="logo-core"></div>
+          <span>J.A.R.V.I.S.</span>
+        </div>
+        <p>The Next-Gen Autonomous Desktop AI Assistant.</p>
+      </div>
+      <div class="footer-copy">
+        © 2026 JARVIS Commercial Edition. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
