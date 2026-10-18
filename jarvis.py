@@ -34,6 +34,7 @@ from system_tools import (
 )
 from config import ELEVENLABS_API_KEY, ELEVENLABS_VOICE_ID
 from voice_manager import voice_picker
+from license_guard import enforce_license
 
 console = Console()
 MODEL = "llama3.2"
@@ -412,6 +413,7 @@ class Jarvis:
             speak(content)
 
 def main():
+    enforce_license()
     jarvis = Jarvis()
     console.print("[dim]💡 Tip: Say [bold]'change voice'[/bold] or [bold]'change jarvis voice'[/bold] to pick a new voice![/dim]")
     try:

@@ -2,6 +2,7 @@
 config.py
 .env
 *.key
+license.dat
 
 # Personal memory file
 memory.txt
