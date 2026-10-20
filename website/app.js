@@ -121,3 +121,59 @@ function simulateCommand(key) {
     }, (index + 1) * 600);
   });
 }
+
+function executeCustomCommand() {
+  const inputEl = document.getElementById('terminal-custom-input');
+  if (!inputEl) return;
+  const val = inputEl.value.trim();
+  if (!val || isSimulating) return;
+
+  inputEl.value = '';
+  isSimulating = true;
+
+  // Add user row
+  const userRow = document.createElement('div');
+  userRow.className = 'log-row user';
+  userRow.innerHTML = `<span>🗣️ You: "${val}"</span>`;
+  terminalBody.appendChild(userRow);
+  terminalBody.scrollTop = terminalBody.scrollHeight;
+
+  const low = val.toLowerCase();
+
+  setTimeout(() => {
+    let toolAction = null;
+    let botReply = '';
+
+    if (low.includes('screen') || low.includes('look') || low.includes('see') || low.includes('window')) {
+      toolAction = '⚡ Executing Tool: analyze_screen(query="Analyze active window and content")';
+      botReply = '🤖 JARVIS: "Yes sir, on your active screen I can see your browser is open on the JARVIS official website, with the interactive demo running smoothly."';
+    } else if (low.includes('ppt') || low.includes('presentation') || low.includes('slide')) {
+      toolAction = `⚡ Executing Tool: create_presentation(topic="${val.replace(/create|presentation|ppt|slide/gi, '').trim() || 'Modern AI'}")`;
+      botReply = '🤖 JARVIS: "Right away sir. Generating a formatted PowerPoint presentation deck with slides, diagrams, and launching Microsoft PowerPoint for you."';
+    } else if (low.includes('click') || low.includes('open') || low.includes('launch')) {
+      toolAction = `⚡ Executing Tool: open_application(app_name="${val.replace(/open|launch|click/gi, '').trim() || 'target'}")`;
+      botReply = '🤖 JARVIS: "Command received sir. Locating target coordinates on your display and executing action now."';
+    } else if (low.includes('find') || low.includes('search') || low.includes('file')) {
+      toolAction = '⚡ Executing Tool: search_computer_files(query="user files")';
+      botReply = '🤖 JARVIS: "Scanned all drives in 280ms. Target file found and ready to open upon your command, sir."';
+    } else {
+      botReply = '🤖 JARVIS: "System online and standing by, sir. How may I assist you with your desktop tasks today?"';
+    }
+
+    if (toolAction) {
+      const actRow = document.createElement('div');
+      actRow.className = 'log-row action';
+      actRow.innerHTML = `<span>${toolAction}</span>`;
+      terminalBody.appendChild(actRow);
+    }
+
+    setTimeout(() => {
+      const botRow = document.createElement('div');
+      botRow.className = 'log-row bot';
+      botRow.innerHTML = `<span>${botReply}</span>`;
+      terminalBody.appendChild(botRow);
+      terminalBody.scrollTop = terminalBody.scrollHeight;
+      isSimulating = false;
+    }, toolAction ? 600 : 200);
+  }, 400);
+}

@@ -21,9 +21,77 @@ console = Console()
 LICENSE_FILE = "license.dat"
 DEV_MASTER_KEYS = ["JARVIS-DEV-MASTER-2026", "JARVIS-VIP-ACCESS"]
 
-# Lemon Squeezy API Endpoints
-LEMON_VALIDATE_URL = "https://api.lemonsqueezy.com/v1/licenses/validate"
-LEMON_ACTIVATE_URL = "https://api.lemonsqueezy.com/v1/licenses/activate"
+# Local accounts database for email + password authentication
+ACCOUNTS_FILE = "accounts.dat"
+
+def _hash_password(password: str) -> str:
+    """Create secure hash of user password."""
+    salt = "JARVIS_AUTH_SALT_SECURE_2026"
+    return hashlib.sha256(f"{password}:{salt}".encode()).hexdigest()
+
+def _load_accounts() -> dict:
+    if os.path.exists(ACCOUNTS_FILE):
+        try:
+            with open(ACCOUNTS_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return {}
+    return {}
+
+def _save_accounts(accounts: dict):
+    with open(ACCOUNTS_FILE, "w", encoding="utf-8") as f:
+        json.dump(accounts, f, indent=2)
+
+def register_user(email: str, password: str) -> bool:
+    """Registers a new user account bound to this machine."""
+    email = email.strip().lower()
+    if not email or "@" not in email:
+        console.print("[bold red]❌ Please enter a valid email address.[/bold red]")
+        return False
+    if len(password) < 6:
+        console.print("[bold red]❌ Password must be at least 6 characters.[/bold red]")
+        return False
+    
+    accounts = _load_accounts()
+    if email in accounts:
+        console.print("[yellow]⚠️ An account with this email already exists. Please log in.[/yellow]")
+        return False
+    
+    current_hwid = get_hardware_id()
+    accounts[email] = {
+        "password_hash": _hash_password(password),
+        "hwid": current_hwid,
+        "created_at": int(time.time()),
+        "status": "active"
+    }
+    _save_accounts(accounts)
+    _save_local_license(f"USER:{email}", current_hwid)
+    console.print(Panel(f"[bold green]🎉 Account Created Successfully![/bold green]\nWelcome, [bold]{email}[/bold]! You are logged in.", border_style="green"))
+    return True
+
+def login_user(email: str, password: str) -> bool:
+    """Logs in an existing user with email and password."""
+    email = email.strip().lower()
+    accounts = _load_accounts()
+    
+    if email not in accounts:
+        # Developer master account bypass
+        if email == "admin" and password == "JARVIS-DEV-MASTER-2026":
+            _save_local_license("DEV_ADMIN", get_hardware_id())
+            console.print(Panel("[bold green]✅ Developer Admin Logged In![/bold green]", border_style="green"))
+            return True
+        console.print("[bold red]❌ Account not found. Please register first.[/bold red]")
+        return False
+    
+    acc = accounts[email]
+    if acc.get("password_hash") != _hash_password(password):
+        console.print("[bold red]❌ Incorrect password.[/bold red]")
+        return False
+    
+    current_hwid = get_hardware_id()
+    _save_local_license(f"USER:{email}", current_hwid)
+    console.print(Panel(f"[bold green]✅ Welcome back, {email}![/bold green]\nLogin successful.", border_style="green"))
+    return True
 
 def get_hardware_id() -> str:
     """
@@ -140,40 +208,56 @@ def _save_local_license(license_key: str, hwid: str):
 
 def enforce_license():
     """
-    Enforces license check on startup.
-    Blocks program execution if no valid subscription exists.
+    User Authentication & Access System.
+    Users can:
+    1. Create a New Account (Email + Password)
+    2. Log In to an Existing Account
+    3. Enter an activation License Key directly
     """
-    hwid = get_hardware_id()
-    
-    # 1. Check if already activated and valid
+    # 1. Check if already activated and authenticated on this device
     if verify_local_license():
         return True
 
-    # 2. Prompt user for license key
+    hwid = get_hardware_id()
     console.print(Panel(
-        f"[bold cyan]🤖 J.A.R.V.I.S. Commercial Edition[/bold cyan]\n\n"
-        f"This software requires an active subscription ($5/month).\n"
-        f"Get your license key at: [bold underline blue]https://yourstore.lemonsqueezy.com[/bold underline blue]\n\n"
-        f"[dim]Machine Hardware ID (HWID): [bold]{hwid}[/bold][/dim]",
+        f"[bold cyan]🤖 J.A.R.V.I.S. AI Workstation[/bold cyan]\n\n"
+        f"Welcome! Please log in or create an account to start using JARVIS.\n"
+        f"[dim]Device Hardware ID: {hwid}[/dim]",
         border_style="cyan"
     ))
 
-    for attempt in range(3):
-        key = Prompt.ask("\n[bold yellow]🔑 Enter your License Key[/bold yellow]").strip()
-        if not key:
-            continue
-            
-        if activate_online(key):
-            return True
-            
-        remaining = 2 - attempt
-        if remaining > 0:
-            console.print(f"[red]Invalid key. You have {remaining} attempt(s) remaining.[/red]")
-        else:
-            console.print("[bold red]Access Denied. Program terminated.[/bold red]")
-            sys.exit(1)
+    while True:
+        console.print("\n[bold]Select an option:[/bold]")
+        console.print("  [bold green]1.[/bold green] Log In to existing account")
+        console.print("  [bold cyan]2.[/bold cyan] Create a new account")
+        console.print("  [bold yellow]3.[/bold yellow] Activate using License Key")
+        console.print("  [bold red]4.[/bold red] Exit")
 
-    sys.exit(1)
+        choice = Prompt.ask("\nEnter choice (1-4)", default="1").strip()
+
+        if choice == "1":
+            email = Prompt.ask("📧 Enter Email").strip()
+            password = Prompt.ask("🔒 Enter Password", password=True).strip()
+            if login_user(email, password):
+                return True
+
+        elif choice == "2":
+            console.print("\n[bold cyan]── Create New JARVIS Account ──[/bold cyan]")
+            email = Prompt.ask("📧 Enter your Email").strip()
+            password = Prompt.ask("🔒 Create a Password (min 6 chars)", password=True).strip()
+            if register_user(email, password):
+                return True
+
+        elif choice == "3":
+            key = Prompt.ask("🔑 Enter your License Key").strip()
+            if activate_online(key):
+                return True
+
+        elif choice in ["4", "exit", "quit", "q"]:
+            console.print("[dim]Goodbye![/dim]")
+            sys.exit(0)
+        else:
+            console.print("[red]Invalid choice. Please select 1, 2, 3 or 4.[/red]")
 
 if __name__ == "__main__":
     enforce_license()
