@@ -1,6 +1,41 @@
 import os
 os.environ["OLLAMA_MODELS"] = r"E:\ai-image-saas\ollama_models"
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+
+# ── Auto-start Ollama if not already running ──────────────────────────────────
+import subprocess, time, requests as _requests
+def _ensure_ollama_running():
+    """Automatically starts Ollama server if it is not already running."""
+    try:
+        _requests.get("http://localhost:11434", timeout=2)
+        return  # already running
+    except Exception:
+        pass
+    try:
+        env = os.environ.copy()
+        env["OLLAMA_MODELS"] = r"E:\ai-image-saas\ollama_models"
+        subprocess.Popen(
+            ["ollama", "serve"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            env=env
+        )
+        # Wait up to 10 seconds for Ollama to come online
+        for _ in range(20):
+            time.sleep(0.5)
+            try:
+                _requests.get("http://localhost:11434", timeout=1)
+                print("[JARVIS] Ollama started automatically.")
+                return
+            except Exception:
+                continue
+        print("[JARVIS] WARNING: Ollama may not have started. Continuing anyway.")
+    except FileNotFoundError:
+        print("[JARVIS] ERROR: Ollama not found. Download from https://ollama.com/download")
+
+_ensure_ollama_running()
+# ─────────────────────────────────────────────────────────────────────────────
+
 import ollama
 import sys
 import re
