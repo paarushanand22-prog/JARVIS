@@ -143,7 +143,18 @@ function executeCustomCommand() {
     let toolAction = null;
     let botReply = '';
 
-    if (low.includes('screen') || low.includes('look') || low.includes('see') || low.includes('window')) {
+    // Mathematical calculation evaluation
+    const mathMatch = val.match(/^(?:what\s+is\s+|calculate\s+|solve\s+)?([0-9\s\+\-\*\/\^\.\(\)]+)$/i);
+    let calculated = null;
+    if (mathMatch && mathMatch[1] && /[0-9]/.test(mathMatch[1]) && /[\+\-\*\/]/.test(mathMatch[1])) {
+      try {
+        calculated = Function(`'use strict'; return (${mathMatch[1]})`)();
+      } catch (e) {}
+    }
+
+    if (calculated !== null && !isNaN(calculated)) {
+      botReply = `🤖 JARVIS: "The answer is ${calculated}, sir."`;
+    } else if (low.includes('screen') || low.includes('look') || low.includes('see') || low.includes('window')) {
       toolAction = '⚡ Executing Tool: analyze_screen(query="Analyze active window and content")';
       botReply = '🤖 JARVIS: "Yes sir, on your active screen I can see your browser is open on the JARVIS official website, with the interactive demo running smoothly."';
     } else if (low.includes('ppt') || low.includes('presentation') || low.includes('slide')) {
@@ -159,8 +170,12 @@ function executeCustomCommand() {
       botReply = '🤖 JARVIS: "Scanned all drives in 280ms. Target file found and ready to open upon your command, sir."';
     } else if (low.includes('hi') || low.includes('hello') || low.includes('hey') || low.includes('how are you')) {
       botReply = '🤖 JARVIS: "Hello sir! I am fully operational and ready. How may I assist you with your computer today?"';
+    } else if (low === 'yes' || low === 'yeah' || low === 'ok' || low === 'sure' || low === 'proceed') {
+      botReply = '🤖 JARVIS: "Acknowledged, sir. Standing by for your next instruction."';
+    } else if (low.includes('who are you') || low.includes('what are you')) {
+      botReply = '🤖 JARVIS: "I am J.A.R.V.I.S., an autonomous desktop AI assistant running locally on Windows to control apps, analyze your screen, and automate tasks."';
     } else {
-      botReply = `🤖 JARVIS: "Understood sir. Executing '${val}' right away."`;
+      botReply = `🤖 JARVIS: "Acknowledged sir: '${val}'. Processing instruction with local neural engine."`;
     }
 
     if (toolAction) {
