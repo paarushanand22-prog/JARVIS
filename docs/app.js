@@ -122,7 +122,7 @@ function simulateCommand(key) {
   });
 }
 
-function executeCustomCommand() {
+async function executeCustomCommand() {
   const inputEl = document.getElementById('terminal-custom-input');
   if (!inputEl) return;
   const val = inputEl.value.trim();
@@ -139,59 +139,142 @@ function executeCustomCommand() {
 
   const low = val.toLowerCase();
 
-  setTimeout(() => {
-    let toolAction = null;
-    let botReply = '';
-
-    // Mathematical calculation evaluation
-    const mathMatch = val.match(/^(?:what\s+is\s+|calculate\s+|solve\s+)?([0-9\s\+\-\*\/\^\.\(\)]+)$/i);
-    let calculated = null;
-    if (mathMatch && mathMatch[1] && /[0-9]/.test(mathMatch[1]) && /[\+\-\*\/]/.test(mathMatch[1])) {
-      try {
-        calculated = Function(`'use strict'; return (${mathMatch[1]})`)();
-      } catch (e) {}
-    }
-
-    if (calculated !== null && !isNaN(calculated)) {
-      botReply = `🤖 JARVIS: "The answer is ${calculated}, sir."`;
-    } else if (low.includes('screen') || low.includes('look') || low.includes('see') || low.includes('window')) {
-      toolAction = '⚡ Executing Tool: analyze_screen(query="Analyze active window and content")';
-      botReply = '🤖 JARVIS: "Yes sir, on your active screen I can see your browser is open on the JARVIS official website, with the interactive demo running smoothly."';
-    } else if (low.includes('ppt') || low.includes('presentation') || low.includes('slide')) {
-      const topic = val.replace(/create|presentation|ppt|slide/gi, '').trim() || 'Modern AI';
-      toolAction = `⚡ Executing Tool: create_presentation(topic="${topic}")`;
-      botReply = `🤖 JARVIS: "Right away sir. Generating a formatted PowerPoint presentation deck on '${topic}' and launching Microsoft PowerPoint for you."`;
-    } else if (low.includes('click') || low.includes('open') || low.includes('launch')) {
-      const app = val.replace(/open|launch|click/gi, '').trim() || 'target';
-      toolAction = `⚡ Executing Tool: open_application(app_name="${app}")`;
-      botReply = `🤖 JARVIS: "Command received sir. Opening ${app} and locating coordinates on your display."`;
-    } else if (low.includes('find') || low.includes('search') || low.includes('file')) {
-      toolAction = '⚡ Executing Tool: search_computer_files(query="user files")';
-      botReply = '🤖 JARVIS: "Scanned all drives in 280ms. Target file found and ready to open upon your command, sir."';
-    } else if (low.includes('hi') || low.includes('hello') || low.includes('hey') || low.includes('how are you')) {
-      botReply = '🤖 JARVIS: "Hello sir! I am fully operational and ready. How may I assist you with your computer today?"';
-    } else if (low === 'yes' || low === 'yeah' || low === 'ok' || low === 'sure' || low === 'proceed') {
-      botReply = '🤖 JARVIS: "Acknowledged, sir. Standing by for your next instruction."';
-    } else if (low.includes('who are you') || low.includes('what are you')) {
-      botReply = '🤖 JARVIS: "I am J.A.R.V.I.S., an autonomous desktop AI assistant running locally on Windows to control apps, analyze your screen, and automate tasks."';
-    } else {
-      botReply = `🤖 JARVIS: "Acknowledged sir: '${val}'. Processing instruction with local neural engine."`;
-    }
-
-    if (toolAction) {
-      const actRow = document.createElement('div');
-      actRow.className = 'log-row action';
-      actRow.innerHTML = `<span>${toolAction}</span>`;
-      terminalBody.appendChild(actRow);
-      terminalBody.scrollTop = terminalBody.scrollHeight;
-    }
+  // 1. Check for Exclusive Desktop Action Features (simulated tool execution demo)
+  if (low.includes('screen') || low.includes('look') || low.includes('see') || low.includes('window')) {
+    const actRow = document.createElement('div');
+    actRow.className = 'log-row action';
+    actRow.innerHTML = `<span>⚡ Executing Tool: analyze_screen(query="Analyze active window and content")</span>`;
+    terminalBody.appendChild(actRow);
+    terminalBody.scrollTop = terminalBody.scrollHeight;
 
     setTimeout(() => {
       const botRow = document.createElement('div');
       botRow.className = 'log-row bot';
-      botRow.innerHTML = `<span>${botReply}</span>`;
+      botRow.innerHTML = `<span>🤖 JARVIS: "Yes sir, on your active screen I can see your browser is open on the JARVIS official website, with the interactive terminal running smoothly."</span>`;
       terminalBody.appendChild(botRow);
       terminalBody.scrollTop = terminalBody.scrollHeight;
-    }, toolAction ? 450 : 150);
-  }, 250);
+    }, 500);
+    return;
+  }
+
+  if (low.includes('ppt') || low.includes('presentation') || low.includes('slide')) {
+    const topic = val.replace(/create|presentation|ppt|slide/gi, '').trim() || 'Modern AI';
+    const actRow = document.createElement('div');
+    actRow.className = 'log-row action';
+    actRow.innerHTML = `<span>⚡ Executing Tool: create_presentation(topic="${topic}")</span>`;
+    terminalBody.appendChild(actRow);
+    terminalBody.scrollTop = terminalBody.scrollHeight;
+
+    setTimeout(() => {
+      const botRow = document.createElement('div');
+      botRow.className = 'log-row bot';
+      botRow.innerHTML = `<span>🤖 JARVIS: "Right away sir. Generating a formatted PowerPoint presentation deck on '${topic}' and launching Microsoft PowerPoint for you."</span>`;
+      terminalBody.appendChild(botRow);
+      terminalBody.scrollTop = terminalBody.scrollHeight;
+    }, 500);
+    return;
+  }
+
+  if (low.includes('click') || low.includes('open') || low.includes('launch')) {
+    const app = val.replace(/open|launch|click/gi, '').trim() || 'target';
+    const actRow = document.createElement('div');
+    actRow.className = 'log-row action';
+    actRow.innerHTML = `<span>⚡ Executing Tool: open_application(app_name="${app}")</span>`;
+    terminalBody.appendChild(actRow);
+    terminalBody.scrollTop = terminalBody.scrollHeight;
+
+    setTimeout(() => {
+      const botRow = document.createElement('div');
+      botRow.className = 'log-row bot';
+      botRow.innerHTML = `<span>🤖 JARVIS: "Command received sir. Opening ${app} and locating coordinates on your display."</span>`;
+      terminalBody.appendChild(botRow);
+      terminalBody.scrollTop = terminalBody.scrollHeight;
+    }, 450);
+    return;
+  }
+
+  if (low.includes('find') || low.includes('search') || low.includes('file')) {
+    const actRow = document.createElement('div');
+    actRow.className = 'log-row action';
+    actRow.innerHTML = `<span>⚡ Executing Tool: search_computer_files(query="user files")</span>`;
+    terminalBody.appendChild(actRow);
+    terminalBody.scrollTop = terminalBody.scrollHeight;
+
+    setTimeout(() => {
+      const botRow = document.createElement('div');
+      botRow.className = 'log-row bot';
+      botRow.innerHTML = `<span>🤖 JARVIS: "Scanned all drives in 280ms. Target file found and ready to open upon your command, sir."</span>`;
+      terminalBody.appendChild(botRow);
+      terminalBody.scrollTop = terminalBody.scrollHeight;
+    }, 450);
+    return;
+  }
+
+  // 2. Math Calculations
+  const mathMatch = val.match(/^(?:what\s+is\s+|calculate\s+|solve\s+)?([0-9\s\+\-\*\/\^\.\(\)]+)$/i);
+  if (mathMatch && mathMatch[1] && /[0-9]/.test(mathMatch[1]) && /[\+\-\*\/]/.test(mathMatch[1])) {
+    try {
+      const calculated = Function(`'use strict'; return (${mathMatch[1]})`)();
+      if (!isNaN(calculated)) {
+        const botRow = document.createElement('div');
+        botRow.className = 'log-row bot';
+        botRow.innerHTML = `<span>🤖 JARVIS: "The answer is ${calculated}, sir."</span>`;
+        terminalBody.appendChild(botRow);
+        terminalBody.scrollTop = terminalBody.scrollHeight;
+        return;
+      }
+    } catch (e) {}
+  }
+
+  // 3. Real AI Answer for ANY user question!
+  // Show thinking indicator
+  const thinkingRow = document.createElement('div');
+  thinkingRow.className = 'log-row sys';
+  thinkingRow.innerHTML = `<span>[NEURAL CORE] Processing query...</span>`;
+  terminalBody.appendChild(thinkingRow);
+  terminalBody.scrollTop = terminalBody.scrollHeight;
+
+  try {
+    let answer = '';
+    // Call Puter AI for live browser intelligence
+    if (window.puter && window.puter.ai) {
+      const aiPrompt = `You are JARVIS, an autonomous desktop AI assistant communicating in polite, helpful, concise Indian English. Answer the user's question directly in 1 to 3 sentences. User question: "${val}"`;
+      const response = await puter.ai.chat(aiPrompt);
+      answer = response.toString().trim();
+    }
+
+    if (!answer) {
+      // Fallback encyclopedic knowledge lookup via Wikipedia Action API
+      const wikiUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&titles=${encodeURIComponent(val)}&format=json&origin=*`;
+      const res = await fetch(wikiUrl);
+      const data = await res.json();
+      const pages = data.query?.pages;
+      if (pages) {
+        const pid = Object.keys(pages)[0];
+        if (pid !== "-1" && pages[pid].extract) {
+          const sentences = pages[pid].extract.split('. ').slice(0, 2).join('. ') + '.';
+          answer = `Sir, ${sentences}`;
+        }
+      }
+    }
+
+    if (!answer) {
+      answer = `Understood sir. For advanced desktop execution of '${val}', please download the JARVIS Commercial Edition.`;
+    }
+
+    thinkingRow.remove();
+    const botRow = document.createElement('div');
+    botRow.className = 'log-row bot';
+    botRow.innerHTML = `<span>🤖 JARVIS: "${answer}"</span>`;
+    terminalBody.appendChild(botRow);
+    terminalBody.scrollTop = terminalBody.scrollHeight;
+
+  } catch (err) {
+    thinkingRow.remove();
+    const botRow = document.createElement('div');
+    botRow.className = 'log-row bot';
+    botRow.innerHTML = `<span>🤖 JARVIS: "Understood sir. Standing by to assist you with '${val}'."</span>`;
+    terminalBody.appendChild(botRow);
+    terminalBody.scrollTop = terminalBody.scrollHeight;
+  }
 }
