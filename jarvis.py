@@ -205,12 +205,12 @@ def _play_audio_file(file_path: str):
     except Exception as e:
         console.print(f"[dim]Audio playback error: {e}[/dim]")
 
-def _speak_hindi_neural(clean_text: str) -> bool:
-    """Uses Edge-TTS Neural Indian voice (hi-IN-MadhurNeural) with gTTS fallback for natural Hindi."""
+def _speak_indian_english(clean_text: str) -> bool:
+    """Uses Edge-TTS Neural Indian English voice (en-IN-PrabhatNeural or en-IN-NeerjaNeural)."""
     try:
-        audio_file = "jarvis_hindi_speech.mp3"
+        audio_file = "jarvis_speech.mp3"
         async def _gen():
-            communicate = edge_tts.Communicate(clean_text, "hi-IN-MadhurNeural", rate="+5%")
+            communicate = edge_tts.Communicate(clean_text, "en-IN-PrabhatNeural", rate="+5%")
             await communicate.save(audio_file)
         asyncio.run(_gen())
         _play_audio_file(audio_file)
@@ -218,13 +218,13 @@ def _speak_hindi_neural(clean_text: str) -> bool:
     except Exception:
         try:
             from gtts import gTTS
-            audio_file = "jarvis_hindi_speech.mp3"
-            tts = gTTS(clean_text, lang='hi')
+            audio_file = "jarvis_speech.mp3"
+            tts = gTTS(clean_text, lang='en', tld='co.in')
             tts.save(audio_file)
             _play_audio_file(audio_file)
             return True
         except Exception as e:
-            console.print(f"[dim]Hindi speech error: {e}[/dim]")
+            console.print(f"[dim]Indian English speech error: {e}[/dim]")
             return False
 
 def _speak_builtin(clean_text: str):
@@ -238,26 +238,23 @@ def _speak_builtin(clean_text: str):
 
 def speak(text):
     """
-    Intelligent Bilingual Speech:
-    - Hindi / Hinglish -> Microsoft Neural Indian Voice (hi-IN-MadhurNeural / gTTS) for 100% authentic pronunciation.
-    - English -> ElevenLabs Ultra-Realistic Voice (Roger) with fallback.
+    Strictly English (India) Speech Engine.
+    - Uses ElevenLabs if available, or natural Neural Indian English (en-IN-PrabhatNeural).
     """
     clean_text = clean_text_for_speech(text)
     if not clean_text:
         return
 
-    # 1. If text is Hindi or Hinglish, speak using authentic Indian neural voice
-    if is_hindi_or_hinglish(clean_text):
-        if _speak_hindi_neural(clean_text):
-            return
-
-    # 2. For English, use ElevenLabs
+    # 1. Try ElevenLabs
     if _speak_elevenlabs(clean_text):
         return
 
-    # 3. Fallbacks if ElevenLabs is unavailable or quota is exceeded
-    if not _speak_hindi_neural(clean_text):
-        _speak_builtin(clean_text)
+    # 2. Authentic Neural English (India)
+    if _speak_indian_english(clean_text):
+        return
+
+    # 3. Built-in Windows TTS fallback
+    _speak_builtin(clean_text)
 
 
 def listen_for_voice():
@@ -270,13 +267,13 @@ def listen_for_voice():
             audio = recognizer.listen(source, timeout=None, phrase_time_limit=15)
             console.print("[dim]⏳ Processing speech...[/dim]")
 
-            # Primary: Google Speech Recognition (Fast & supports English/Hindi/Hinglish)
+            # Primary: Google Speech Recognition (Optimized for English - India)
             try:
-                text = recognizer.recognize_google(audio)
+                text = recognizer.recognize_google(audio, language="en-IN")
             except (sr.RequestError, Exception):
                 # Fallback: Whisper AI (Runs completely offline on your RTX 4050)
                 console.print("[dim]Offline detected, processing with Whisper AI...[/dim]")
-                text = recognizer.recognize_whisper(audio, model="base")
+                text = recognizer.recognize_whisper(audio, model="base", language="en")
 
             console.print(f"\n[bold cyan]🗣️ You:[/bold cyan] {text}")
             return text
@@ -300,11 +297,10 @@ class Jarvis:
                     memory_context = f"\n\nHere are things you have learned and MUST remember about the user:\n{facts}"
 
         sys_prompt = (
-            "You are JARVIS, an advanced, highly conversational personal AI assistant for your user.\n"
-            "Languages: You speak fluent English, natural Hindi, and conversational Hinglish. "
-            "When replying in Hindi or Hinglish, speak in natural, polite Indian phrasing "
-            "(e.g., 'Ji sir, main abhi screen analyze kar raha hoon.', 'Main option click kar raha hoon.'). "
-            "Never produce robotic, broken, or weird repetitive phrases.\n"
+            "You are JARVIS, an advanced personal AI executive assistant.\n"
+            "Language Rule: You must speak and communicate ONLY in English (Indian English accent and dialect). "
+            "Never reply in Hindi, Devanagari script, or Hinglish. Always respond in fluent, professional, polite Indian English "
+            "(e.g., 'Yes sir, I am analyzing your screen right now.', 'Certainly sir, let me click that option for you.').\n"
             "Capabilities & Real-Time Device Orders:\n"
             "- Live Screen Analysis: If the user asks to see, look at, check, read, or analyze what is currently on their screen, "
             "or asks about an open window, website, chart, or error, call 'analyze_screen(query)'.\n"
@@ -319,7 +315,7 @@ class Jarvis:
             "- Files: To find any file or document on the computer, call 'search_computer_files(query)'. To open a file, call 'open_file(file_path)'.\n"
             "- Memory: Autonomously call 'remember_fact' whenever you learn personal user preferences.\n"
             "User's home directory is C:\\Users\\loq. Keep answers concise, polite, natural, and direct. "
-            "IMPORTANT: When responding to simple greetings (like 'hi', 'hello', 'hey', 'kaise ho'), only give a simple, friendly greeting back. "
+            "IMPORTANT: When responding to simple greetings (like 'hi', 'hello', 'hey'), only give a simple, friendly greeting back. "
             "Do NOT randomly bring up past memories, facts, or assumptions unless the user specifically asks about them."
             + memory_context
         )
@@ -327,8 +323,8 @@ class Jarvis:
         self.messages = [
             {"role": "system", "content": sys_prompt}
         ]
-        console.print(Panel(f"[bold cyan]J.A.R.V.I.S. Initialized (Voice & Memory Mode)[/bold cyan]\nPowered by {MODEL}.", border_style="cyan"))
-        speak("System online. Main aapki kya madad kar sakta hoon?")
+        console.print(Panel(f"[bold cyan]J.A.R.V.I.S. Initialized (English India Mode)[/bold cyan]\nPowered by {MODEL}.", border_style="cyan"))
+        speak("System online, sir. How may I assist you today?")
 
     def _needs_tools(self, prompt: str) -> bool:
         """Lightweight keyword check. Only enable tools when truly needed."""
