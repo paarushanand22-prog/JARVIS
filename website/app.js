@@ -126,12 +126,11 @@ function executeCustomCommand() {
   const inputEl = document.getElementById('terminal-custom-input');
   if (!inputEl) return;
   const val = inputEl.value.trim();
-  if (!val || isSimulating) return;
+  if (!val) return;
 
   inputEl.value = '';
-  isSimulating = true;
 
-  // Add user row
+  // Add user row immediately
   const userRow = document.createElement('div');
   userRow.className = 'log-row user';
   userRow.innerHTML = `<span>🗣️ You: "${val}"</span>`;
@@ -148,16 +147,20 @@ function executeCustomCommand() {
       toolAction = '⚡ Executing Tool: analyze_screen(query="Analyze active window and content")';
       botReply = '🤖 JARVIS: "Yes sir, on your active screen I can see your browser is open on the JARVIS official website, with the interactive demo running smoothly."';
     } else if (low.includes('ppt') || low.includes('presentation') || low.includes('slide')) {
-      toolAction = `⚡ Executing Tool: create_presentation(topic="${val.replace(/create|presentation|ppt|slide/gi, '').trim() || 'Modern AI'}")`;
-      botReply = '🤖 JARVIS: "Right away sir. Generating a formatted PowerPoint presentation deck with slides, diagrams, and launching Microsoft PowerPoint for you."';
+      const topic = val.replace(/create|presentation|ppt|slide/gi, '').trim() || 'Modern AI';
+      toolAction = `⚡ Executing Tool: create_presentation(topic="${topic}")`;
+      botReply = `🤖 JARVIS: "Right away sir. Generating a formatted PowerPoint presentation deck on '${topic}' and launching Microsoft PowerPoint for you."`;
     } else if (low.includes('click') || low.includes('open') || low.includes('launch')) {
-      toolAction = `⚡ Executing Tool: open_application(app_name="${val.replace(/open|launch|click/gi, '').trim() || 'target'}")`;
-      botReply = '🤖 JARVIS: "Command received sir. Locating target coordinates on your display and executing action now."';
+      const app = val.replace(/open|launch|click/gi, '').trim() || 'target';
+      toolAction = `⚡ Executing Tool: open_application(app_name="${app}")`;
+      botReply = `🤖 JARVIS: "Command received sir. Opening ${app} and locating coordinates on your display."`;
     } else if (low.includes('find') || low.includes('search') || low.includes('file')) {
       toolAction = '⚡ Executing Tool: search_computer_files(query="user files")';
       botReply = '🤖 JARVIS: "Scanned all drives in 280ms. Target file found and ready to open upon your command, sir."';
+    } else if (low.includes('hi') || low.includes('hello') || low.includes('hey') || low.includes('how are you')) {
+      botReply = '🤖 JARVIS: "Hello sir! I am fully operational and ready. How may I assist you with your computer today?"';
     } else {
-      botReply = '🤖 JARVIS: "System online and standing by, sir. How may I assist you with your desktop tasks today?"';
+      botReply = `🤖 JARVIS: "Understood sir. Executing '${val}' right away."`;
     }
 
     if (toolAction) {
@@ -165,6 +168,7 @@ function executeCustomCommand() {
       actRow.className = 'log-row action';
       actRow.innerHTML = `<span>${toolAction}</span>`;
       terminalBody.appendChild(actRow);
+      terminalBody.scrollTop = terminalBody.scrollHeight;
     }
 
     setTimeout(() => {
@@ -173,7 +177,6 @@ function executeCustomCommand() {
       botRow.innerHTML = `<span>${botReply}</span>`;
       terminalBody.appendChild(botRow);
       terminalBody.scrollTop = terminalBody.scrollHeight;
-      isSimulating = false;
-    }, toolAction ? 600 : 200);
-  }, 400);
+    }, toolAction ? 450 : 150);
+  }, 250);
 }
