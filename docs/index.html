@@ -117,14 +117,6 @@
           </div>
         </div>
 
-        <div class="terminal-presets">
-          <span class="presets-label">Try Commands:</span>
-          <button class="preset-pill" onclick="simulateCommand('create_ppt')">📊 Create Big Bang PPT</button>
-          <button class="preset-pill" onclick="simulateCommand('click_settings')">🖱️ Click on Settings</button>
-          <button class="preset-pill" onclick="simulateCommand('analyze_screen')">👁️ Analyze My Screen</button>
-          <button class="preset-pill" onclick="simulateCommand('find_files')">🔍 Search for Resume</button>
-        </div>
-
         <!-- Custom Interactive Typing Input -->
         <div class="terminal-input-bar" style="display:flex; gap:8px; padding:12px; background:rgba(0,0,0,0.5); border-top:1px solid rgba(0,240,255,0.2);">
           <input type="text" id="terminal-custom-input" placeholder="Type a command (e.g. 'check my screen', 'open youtube', 'hello jarvis')..." style="flex:1; background:rgba(15,23,42,0.8); border:1px solid rgba(0,240,255,0.3); color:#fff; padding:10px 14px; border-radius:6px; font-family:'JetBrains Mono',monospace; font-size:13px; outline:none;" onkeydown="if(event.key==='Enter') executeCustomCommand()">
