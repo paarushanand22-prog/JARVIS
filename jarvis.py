@@ -380,12 +380,21 @@ class Jarvis:
         # This prevents the model from hallucinating tool calls on simple greetings.
         tools = all_tools if self._needs_tools(user_prompt) else []
 
+        # Keep conversation history compact to maintain ultra-fast inference speed
+        if len(self.messages) > 12:
+            self.messages = [self.messages[0]] + self.messages[-8:]
+
         with console.status("[bold yellow]JARVIS is thinking..."):
             try:
                 response = ollama.chat(
                     model=MODEL,
                     messages=self.messages,
-                    tools=tools if tools else None
+                    tools=tools if tools else None,
+                    options={
+                        'num_predict': 200,
+                        'temperature': 0.6,
+                        'top_p': 0.9
+                    }
                 )
             except Exception as e:
                 console.print(f"[bold red]Ollama Error: {e}[/bold red]")
@@ -433,7 +442,11 @@ class Jarvis:
             with console.status(f"[bold yellow]JARVIS is reading tool results..."):
                 final_response = ollama.chat(
                     model=MODEL,
-                    messages=self.messages
+                    messages=self.messages,
+                    options={
+                        'num_predict': 250,
+                        'temperature': 0.5
+                    }
                 )
                 final_content = final_response['message']['content']
                 self.messages.append(final_response['message'])
