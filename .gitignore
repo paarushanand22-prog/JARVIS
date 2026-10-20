@@ -25,3 +25,8 @@ folder/
 # IDE files
 .vscode/
 .idea/
+
+# PyInstaller build output (exe kept private - distribute via GitHub Releases)
+dist/
+build/
+*.spec
