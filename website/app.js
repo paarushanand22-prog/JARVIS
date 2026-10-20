@@ -226,40 +226,53 @@ async function executeCustomCommand() {
     } catch (e) {}
   }
 
-  // 3. Real AI Answer for ANY user question!
-  // Show thinking indicator
+  // 3. Real Instant Answer for ANY user question!
   const thinkingRow = document.createElement('div');
   thinkingRow.className = 'log-row sys';
-  thinkingRow.innerHTML = `<span>[NEURAL CORE] Processing query...</span>`;
+  thinkingRow.innerHTML = `<span>[NEURAL CORE] Analyzing question...</span>`;
   terminalBody.appendChild(thinkingRow);
   terminalBody.scrollTop = terminalBody.scrollHeight;
 
   try {
     let answer = '';
-    // Call Puter AI for live browser intelligence
-    if (window.puter && window.puter.ai) {
-      const aiPrompt = `You are JARVIS, an autonomous desktop AI assistant communicating in polite, helpful, concise Indian English. Answer the user's question directly in 1 to 3 sentences. User question: "${val}"`;
-      const response = await puter.ai.chat(aiPrompt);
-      answer = response.toString().trim();
-    }
 
-    if (!answer) {
-      // Fallback encyclopedic knowledge lookup via Wikipedia Action API
-      const wikiUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&titles=${encodeURIComponent(val)}&format=json&origin=*`;
-      const res = await fetch(wikiUrl);
-      const data = await res.json();
-      const pages = data.query?.pages;
-      if (pages) {
-        const pid = Object.keys(pages)[0];
-        if (pid !== "-1" && pages[pid].extract) {
-          const sentences = pages[pid].extract.split('. ').slice(0, 2).join('. ') + '.';
-          answer = `Sir, ${sentences}`;
+    // Step A: Clean search query by removing question prefixes
+    const cleanQuery = val.replace(/^(what is|who is|what are|explain|tell me about|define|describe|why is|how does)\s+/i, '').replace(/['"?\.]+/g, '').trim();
+
+    // Step B: Query Wikipedia Search + Page Summary REST API (Fast, Reliable, Zero Auth, Full CORS)
+    try {
+      const searchUrl = `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(cleanQuery || val)}&limit=1&format=json&origin=*`;
+      const searchRes = await fetch(searchUrl);
+      const searchData = await searchRes.json();
+      const bestTitle = (searchData && searchData[1] && searchData[1][0]) ? searchData[1][0] : cleanQuery;
+
+      if (bestTitle) {
+        const summaryUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(bestTitle.replace(/\s+/g, '_'))}`;
+        const sumRes = await fetch(summaryUrl);
+        if (sumRes.ok) {
+          const sumData = await sumRes.json();
+          if (sumData && sumData.extract) {
+            // Pick first 2 sentences for a crisp, direct answer
+            const sentences = sumData.extract.split(/(?<=[.!?])\s+/).slice(0, 2).join(' ');
+            answer = `Sir, ${sentences}`;
+          }
         }
       }
+    } catch (e) {
+      console.warn('Wiki query error:', e);
+    }
+
+    // Step C: Try in-browser AI provider if available
+    if (!answer && window.puter && window.puter.ai) {
+      try {
+        const aiPrompt = `Answer this question in 2 polite, concise sentences as JARVIS: "${val}"`;
+        const res = await puter.ai.chat(aiPrompt);
+        if (res) answer = res.toString().trim();
+      } catch (e) {}
     }
 
     if (!answer) {
-      answer = `Understood sir. For advanced desktop execution of '${val}', please download the JARVIS Commercial Edition.`;
+      answer = `Sir, I have processed '${val}'. To interact directly with open apps and execute live desktop tasks on this topic, use the full JARVIS Commercial Edition.`;
     }
 
     thinkingRow.remove();
@@ -273,7 +286,7 @@ async function executeCustomCommand() {
     thinkingRow.remove();
     const botRow = document.createElement('div');
     botRow.className = 'log-row bot';
-    botRow.innerHTML = `<span>🤖 JARVIS: "Understood sir. Standing by to assist you with '${val}'."</span>`;
+    botRow.innerHTML = `<span>🤖 JARVIS: "Standing by to assist you, sir. How else may I help?"</span>`;
     terminalBody.appendChild(botRow);
     terminalBody.scrollTop = terminalBody.scrollHeight;
   }
