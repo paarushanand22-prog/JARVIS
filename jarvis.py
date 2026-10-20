@@ -415,24 +415,50 @@ class Jarvis:
 def main():
     enforce_license()
     jarvis = Jarvis()
-    console.print("[dim]💡 Tip: Say [bold]'change voice'[/bold] or [bold]'change jarvis voice'[/bold] to pick a new voice![/dim]")
+    console.print("[dim]💡 Tip: Say [bold]'change voice'[/bold] or type [bold]'type'[/bold] to switch to keyboard input mode![/dim]")
+
+    # Input mode: 'voice' or 'text'
+    input_mode = "voice"
+
     try:
         while True:
-            # Fully Hands-Free Voice Loop
-            user_input = listen_for_voice()
+            # Show current mode
+            if input_mode == "text":
+                console.print("\n[bold yellow]⌨️  Text Mode[/bold yellow] [dim](type 'voice' to switch back to voice)[/dim]")
+                try:
+                    user_input = input("You: ").strip()
+                except (EOFError, KeyboardInterrupt):
+                    break
+            else:
+                console.print("\n[dim]💡 Press [bold]Ctrl+T[/bold] hint: type 'text mode' to switch to typing.[/dim]")
+                user_input = listen_for_voice()
 
             if not user_input:
                 continue
 
-            # --- Special Commands ---
-            lower = user_input.lower()
+            lower = user_input.lower().strip()
 
-            if lower in ['exit', 'quit', 'goodbye', 'stop listening', 'bye jarvis']:
+            # --- Mode Switch Commands ---
+            if lower in ['text', 'text mode', 'type', 'typing mode', 'keyboard']:
+                input_mode = "text"
+                console.print("[bold yellow]⌨️  Switched to TEXT MODE — type your queries![/bold yellow]")
+                speak("Switched to text mode. You can now type your queries.")
+                continue
+
+            if lower in ['voice', 'voice mode', 'mic', 'microphone', 'listen']:
+                input_mode = "voice"
+                console.print("[bold green]🎤 Switched to VOICE MODE![/bold green]")
+                speak("Switched to voice mode.")
+                continue
+
+            # --- Exit Commands ---
+            if lower in ['exit', 'quit', 'goodbye', 'stop listening', 'bye jarvis', 'bye']:
                 goodbye_msg = "Shutting down JARVIS. Goodbye!"
                 console.print(f"[bold red]{goodbye_msg}[/bold red]")
                 speak(goodbye_msg)
                 break
 
+            # --- Voice Change Command ---
             if any(kw in lower for kw in ['change voice', 'change your voice', 'change jarvis voice',
                                            'switch voice', 'new voice', 'different voice', 'voice change',
                                            'apni awaaz', 'awaaz badlo', 'voice badlo']):
@@ -442,6 +468,7 @@ def main():
                 continue
 
             jarvis.process_prompt(user_input)
+
     except KeyboardInterrupt:
         console.print("[bold red]Shutting down...[/bold red]")
         sys.exit(0)

@@ -387,50 +387,76 @@ def analyze_screen(query: str = "Describe what is on my screen right now") -> st
     """
     Live real-time screen analysis: inspects whatever is currently active and visible on the user's computer screen.
     Reads all visible text, open windows, buttons, and explains what is happening using fast Windows OCR and Ollama vision AI.
-    
+
     Args:
         query (str): What to analyze or look for on the screen.
     """
     try:
         # Take live screenshot
         screenshot = pyautogui.screenshot()
-        
-        # 1. Fast Windows OCR text extraction
+
+        # ── Step 1: Fast Windows OCR text extraction ──────────────────────────
         ocr_text = ""
+        ocr_error = ""
         try:
             ocr_res = winocr.recognize_pil_sync(screenshot)
             if ocr_res and 'text' in ocr_res and ocr_res['text'].strip():
                 ocr_text = ocr_res['text'].strip()
-        except Exception:
-            pass
+        except Exception as e:
+            ocr_error = str(e)
 
-        # 2. Rich visual analysis via llava if query asks for visual details or explanation
+        # ── Step 2: Visual analysis via llava (best, shows images) ───────────
         visual_analysis = ""
+        llava_error = ""
         try:
             buf = io.BytesIO()
-            screenshot.save(buf, format='JPEG', quality=80)
+            screenshot.save(buf, format='JPEG', quality=85)
             img_bytes = buf.getvalue()
-            
+
+            # Build context-rich prompt
+            ocr_context = f"\n\nOCR Text already found on screen:\n{ocr_text[:1000]}" if ocr_text else ""
             prompt = (
-                f"You are JARVIS analyzing the user's active computer screen in real-time.\n"
-                f"User Question: {query}\n"
-                f"Provide a concise, direct, and helpful answer describing what is shown on screen, "
-                f"which window or website is active, and any key buttons, forms, or errors visible."
+                f"You are JARVIS, an AI assistant, analyzing the user's live computer screen.\n"
+                f"User's question: {query}\n"
+                f"Describe clearly: which app/website is open, what is visible, any errors, "
+                f"buttons, forms, or important info.{ocr_context}\n"
+                f"Be concise and directly helpful."
             )
             llava_res = ollama.generate(model='llava', prompt=prompt, images=[img_bytes])
             visual_analysis = llava_res.get('response', '').strip()
-        except Exception:
-            pass
+        except Exception as e:
+            llava_error = str(e)
 
+        # ── Step 3: Fallback — use LLM text reasoning over OCR ───────────────
+        if not visual_analysis and ocr_text:
+            try:
+                fallback_prompt = (
+                    f"You are JARVIS. The user asked: '{query}'\n\n"
+                    f"Here is the OCR text extracted from their current screen:\n{ocr_text[:2000]}\n\n"
+                    f"Based on this text, answer the user's question and describe what is on their screen."
+                )
+                fallback_res = ollama.generate(model='llama3.2', prompt=fallback_prompt)
+                visual_analysis = fallback_res.get('response', '').strip()
+            except Exception:
+                pass
+
+        # ── Return best result ────────────────────────────────────────────────
         if visual_analysis:
             return visual_analysis
         elif ocr_text:
-            preview_lines = [line.strip() for line in ocr_text.splitlines() if line.strip()][:15]
-            return "Screen Text Content:\n" + "\n".join(preview_lines)
+            preview_lines = [line.strip() for line in ocr_text.splitlines() if line.strip()][:20]
+            return "Screen Text:\n" + "\n".join(preview_lines)
         else:
-            return "Screen captured, but no distinct text or visual elements were identified."
+            diag = []
+            if ocr_error:
+                diag.append(f"OCR error: {ocr_error}")
+            if llava_error:
+                diag.append(f"Vision AI error: {llava_error}")
+            return "Screen captured but could not extract content. " + " | ".join(diag) if diag else \
+                   "Screen captured, but no visible text or elements were found."
+
     except Exception as e:
-        return f"Error analyzing screen: {e}"
+        return f"Screen analysis failed: {e}"
 
 def click_option(target_name: str) -> str:
     """
