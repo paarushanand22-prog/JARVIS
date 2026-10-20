@@ -318,7 +318,9 @@ class Jarvis:
             "- Apps: To open any app or website, call 'open_application(app_name)'.\n"
             "- Files: To find any file or document on the computer, call 'search_computer_files(query)'. To open a file, call 'open_file(file_path)'.\n"
             "- Memory: Autonomously call 'remember_fact' whenever you learn personal user preferences.\n"
-            "User's home directory is C:\\Users\\loq. Keep answers concise, polite, natural, and direct."
+            "User's home directory is C:\\Users\\loq. Keep answers concise, polite, natural, and direct. "
+            "IMPORTANT: When responding to simple greetings (like 'hi', 'hello', 'hey', 'kaise ho'), only give a simple, friendly greeting back. "
+            "Do NOT randomly bring up past memories, facts, or assumptions unless the user specifically asks about them."
             + memory_context
         )
 
